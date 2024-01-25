@@ -41,15 +41,16 @@ def start_message(message):
     )
 @bot.callback_query_handler(func=lambda call: True)
 def info(call):
+    connection, cursor = get_db_connection()
+    cursor.execute('SELECT * FROM users WHERE chat_id=? ;',[call.from_user.id])
+    info = cursor.fetchall()
     if call.data == "uz":
         bot.send_message(
             call.message.chat.id,
             "Iltimos telefon raqamingizni yuboring",
             reply_markup=contacts_uz()
         )
-        connection, cursor = get_db_connection()
-        cursor.execute('SELECT * FROM users WHERE chat_id=? ;',[call.from_user.id])
-        info = cursor.fetchall()
+
         if not info:
             cursor.execute('INSERT INTO users(name,chat_id) VALUES(?,?);',[call.from_user.first_name, call.from_user.id])
         else:
@@ -63,17 +64,57 @@ def info(call):
             "Пожалуйста, поделитесь своим номером телефона",
             reply_markup=contacts_ru()
         )
-        connection, cursor = get_db_connection()
-        cursor.execute('SELECT * FROM users WHERE chat_id=? ;',[call.from_user.id])
-        info = cursor.fetchall()
         if not info:
             cursor.execute('INSERT INTO users(name,chat_id) VALUES(?,?);',[call.from_user.first_name, call.from_user.id])
         else:
             cursor.execute("UPDATE users SET user_lang='Ru' WHERE id=?;",[info[0][0]])
-        connection.commit()
-        connection.close()
 
+    elif info[0][10]=="wait_district":
+        region_id = call.data
+        if info[0][9]=="Uz":
+            cursor.execute('SELECT id, name_uz FROM districts WHERE region_id=?;', [region_id])
+            districts = cursor.fetchall()
+            keyboard = types.InlineKeyboardMarkup(row_width=1)
+            for district in districts:
+                button = types.InlineKeyboardButton(text=district[1], callback_data=str(districts[0]))
+                keyboard.add(button)
 
+            bot.send_message(
+                call.message.chat.id,
+                "Iltimos tumanni tanlang:",
+                reply_markup=keyboard
+            )
+        elif info[0][9]=="Ru":
+            cursor.execute('SELECT id, name_ru FROM districts WHERE region_id=?;', [region_id])
+            districts = cursor.fetchall()
+            keyboard = types.InlineKeyboardMarkup(row_width=1)
+            for district in districts:
+                button = types.InlineKeyboardButton(text=district[1], callback_data=str(districts[0]))
+                keyboard.add(button)
+
+            bot.send_message(
+                call.message.chat.id,
+                "Iltimos tumanni tanlang:",
+                reply_markup=keyboard
+            )
+        cursor.execute("UPDATE users SET user_state='wait_quarters' WHERE chat_id=?;", [call.message.chat.id])
+    elif info[0][10] == "wait_quarters":
+        district_id = call.data
+        cursor.execute('SELECT id, name FROM quarters WHERE district_id=?;', [district_id])
+        quarters = cursor.fetchall()
+        keyboard = types.InlineKeyboardMarkup(row_width=1)
+        for quarter in quarters:
+            button = types.InlineKeyboardButton(text=quarter[1], callback_data=str(quarter[0]))
+            keyboard.add(button)
+
+        bot.send_message(
+            call.message.chat.id,
+            "Iltimos mahallani tanlang:",
+            reply_markup=keyboard
+        )
+
+    connection.commit()
+    connection.close()
 @bot.message_handler(func=lambda message: True, content_types=['contact'])
 def handle_contact(message):
     chat_id = message.chat.id
@@ -145,7 +186,10 @@ def get_number(message):
     elif info[0][10] == "full_name_received":
         cursor.execute("UPDATE users SET fullname=? WHERE chat_id=?;", [message.text, message.chat.id])
         cursor.execute("UPDATE users SET user_state='have_name' WHERE chat_id=?;", [message.chat.id])
-        select_region_button(info, message)
+        connection.commit()
+        cursor.execute('SELECT * FROM users WHERE chat_id=? ;', [message.from_user.id])
+        info = cursor.fetchall()
+        select_region_button(message)
     elif message.text == "Yo'q❌":
         bot.send_message(
             message.chat.id,
@@ -164,33 +208,32 @@ def get_number(message):
     elif info[0][10] == "wait_fullname":
         cursor.execute("UPDATE users SET fullname=? WHERE chat_id=?;", [message.text, message.chat.id])
         cursor.execute("UPDATE users SET user_state='have_name' WHERE chat_id=?;", [message.chat.id])
-        select_region_button(info, message)
+        connection.commit()
+        cursor.execute('SELECT * FROM users WHERE chat_id=? ;', [message.from_user.id])
+        info = cursor.fetchall()
+        select_region_button(message)
     connection.commit()
     connection.close()
 
 
-def select_region_button(info, message):
+def select_region_button(message):
     connection, cursor = get_db_connection()
-
+    cursor.execute('SELECT * FROM users WHERE chat_id=? ;',[message.from_user.id])
+    info = cursor.fetchall()
     if info[0][9] == "Uz":
         cursor.execute('SELECT id, name_uz FROM regions;')
         regions = cursor.fetchall()
-
-        # Create buttons based on the regions in Uzbek language
         keyboard = types.InlineKeyboardMarkup(row_width=1)
         for region in regions:
             button = types.InlineKeyboardButton(text=region[1], callback_data=str(region[0]))
             keyboard.add(button)
+            print(f"calldata: {button.callback_data}")
 
         bot.send_message(
             message.chat.id,
             "Iltimos hududingizni tanlang:",
             reply_markup=keyboard
         )
-
-        # Update user state to indicate expecting a region
-        cursor.execute("UPDATE users SET user_state='expecting_region' WHERE chat_id=?;", [message.chat.id])
-
     elif info[0][9] == "Ru":
         cursor.execute('SELECT id, name_ru FROM regions;')
         regions = cursor.fetchall()
@@ -198,7 +241,6 @@ def select_region_button(info, message):
         # Create buttons based on the regions in Russian language
         keyboard = types.InlineKeyboardMarkup(row_width=1)
         for region in regions:
-            tes
             button = types.InlineKeyboardButton(text=region[1], callback_data=str(region[0]))
             keyboard.add(button)
 
@@ -208,34 +250,12 @@ def select_region_button(info, message):
             reply_markup=keyboard
         )
 
-        # Update user state to indicate expecting a region
-        cursor.execute("UPDATE users SET user_state='expecting_region' WHERE chat_id=?;", [message.chat.id])
-
+    cursor.execute("UPDATE users SET user_state='wait_district' WHERE chat_id=?;", [message.chat.id])
     connection.commit()
     connection.close()
 
 
-@bot.callback_query_handler(func=lambda call: call.data.startswith('region_'))
-def district_callback(call):
-    region_id = int(call.data.split('_')[1])
 
-    connection, cursor = get_db_connection()
-    cursor.execute('SELECT id, name_uz FROM districts WHERE region_id=?;', [region_id])
-    districts = cursor.fetchall()
-
-    # Create buttons based on the districts in Uzbek language
-    keyboard = types.InlineKeyboardMarkup(row_width=1)
-    for district in districts:
-        button = types.InlineKeyboardButton(text=district[1], callback_data=f'district_{district[0]}')
-        keyboard.add(button)
-
-    bot.send_message(
-        call.message.chat.id,
-        "Iltimos tumanni tanlang:",
-        reply_markup=keyboard
-    )
-
-    connection.close()
 
 # Add similar logic for the Russian language if needed
 

@@ -3735,8 +3735,8 @@
     "pk": 288,
     "fields": {
       "guid": "deb7906b-6cd2-438c-9fe6-c08c3d1a7527",
-      "created_at": "2024-01-27T15:03:32.000Z",
-      "updated_at": "2024-01-27T15:03:32.000Z",
+      "created_at": "2024-01-27T15:03:32Z",
+      "updated_at": "2024-01-27T15:03:32Z",
       "name": "Diydor MFY",
       "name_ru": null,
       "name_uz": "Diydor MFY",
@@ -10131,8 +10131,8 @@
     "pk": 780,
     "fields": {
       "guid": "3333ecb3-df2f-4314-8179-02567ff5a937",
-      "created_at": "2024-01-27T15:03:33.000Z",
-      "updated_at": "2024-01-27T15:03:33.000Z",
+      "created_at": "2024-01-27T15:03:33Z",
+      "updated_at": "2024-01-27T15:03:33Z",
       "name": "Samarobod MFY",
       "name_ru": null,
       "name_uz": "Samarobod MFY",
@@ -21395,6 +21395,227 @@
       "name_ru": null,
       "name_uz": " Yunus Rajabiy MFY",
       "district": 180
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1647,
+    "fields": {
+      "guid": "f061f373-c766-4e68-9c89-f53d376972fd",
+      "created_at": "2024-01-27T17:58:10.636Z",
+      "updated_at": "2024-01-27T17:58:10.636Z",
+      "name": "Ma�rifat MFY",
+      "name_ru": null,
+      "name_uz": "Ma�rifat MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1648,
+    "fields": {
+      "guid": "52826111-f020-4de8-b440-b748fbbf953a",
+      "created_at": "2024-01-27T17:58:10.638Z",
+      "updated_at": "2024-01-27T17:58:10.638Z",
+      "name": "Halimkop MFY",
+      "name_ru": null,
+      "name_uz": "Halimkop MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1649,
+    "fields": {
+      "guid": "88c15179-71e6-4a63-857f-c80679e88073",
+      "created_at": "2024-01-27T17:58:10.638Z",
+      "updated_at": "2024-01-27T17:58:10.638Z",
+      "name": "Gulobod MFY",
+      "name_ru": null,
+      "name_uz": "Gulobod MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1650,
+    "fields": {
+      "guid": "d0f5fe6a-35ed-4ec4-b97c-02ee3f305096",
+      "created_at": "2024-01-27T17:58:10.639Z",
+      "updated_at": "2024-01-27T17:58:10.639Z",
+      "name": "Gultepa MFY",
+      "name_ru": null,
+      "name_uz": "Gultepa MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1651,
+    "fields": {
+      "guid": "88e78913-708f-42d9-9ac2-9601258c41e6",
+      "created_at": "2024-01-27T17:58:10.640Z",
+      "updated_at": "2024-01-27T17:58:10.640Z",
+      "name": "Kalas MFY",
+      "name_ru": null,
+      "name_uz": "Kalas MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1652,
+    "fields": {
+      "guid": "453d28ee-2906-49b9-af79-3eada01e59e2",
+      "created_at": "2024-01-27T17:58:10.640Z",
+      "updated_at": "2024-01-27T17:58:10.640Z",
+      "name": "Farovon MFY",
+      "name_ru": null,
+      "name_uz": "Farovon MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1653,
+    "fields": {
+      "guid": "1f7dd5ce-b5e8-485a-9565-d97dd3f68f47",
+      "created_at": "2024-01-27T17:58:10.641Z",
+      "updated_at": "2024-01-27T17:58:10.641Z",
+      "name": "Chuvalachi MFY",
+      "name_ru": null,
+      "name_uz": "Chuvalachi MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1654,
+    "fields": {
+      "guid": "d9902a84-6534-425e-898e-ea36d676c5f9",
+      "created_at": "2024-01-27T17:58:10.642Z",
+      "updated_at": "2024-01-27T17:58:10.642Z",
+      "name": "Navoiy MFY",
+      "name_ru": null,
+      "name_uz": "Navoiy MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1655,
+    "fields": {
+      "guid": "e13916c9-11ed-4fb3-bd83-f5cf3a68edf2",
+      "created_at": "2024-01-27T17:58:10.643Z",
+      "updated_at": "2024-01-27T17:58:10.643Z",
+      "name": "Hasanboy MFY",
+      "name_ru": null,
+      "name_uz": "Hasanboy MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1656,
+    "fields": {
+      "guid": "ab11c592-c692-4829-8785-fe732ca6b796",
+      "created_at": "2024-01-27T17:58:10.644Z",
+      "updated_at": "2024-01-27T17:58:10.644Z",
+      "name": "Keles shahri",
+      "name_ru": null,
+      "name_uz": "Keles shahri",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1657,
+    "fields": {
+      "guid": "7bf2291d-6be5-43d3-b835-4fa8144945df",
+      "created_at": "2024-01-27T17:58:10.644Z",
+      "updated_at": "2024-01-27T17:58:10.644Z",
+      "name": "Qizg�aldoq MFY",
+      "name_ru": null,
+      "name_uz": "Qizg�aldoq MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1658,
+    "fields": {
+      "guid": "1aa64c4a-78f6-4051-aaf5-768e0d9ac7e3",
+      "created_at": "2024-01-27T17:58:10.645Z",
+      "updated_at": "2024-01-27T17:58:10.645Z",
+      "name": "Keles massivi",
+      "name_ru": null,
+      "name_uz": "Keles massivi",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1659,
+    "fields": {
+      "guid": "36312ee5-ce9d-4e0e-8020-0454ca193a46",
+      "created_at": "2024-01-27T17:58:10.645Z",
+      "updated_at": "2024-01-27T17:58:10.645Z",
+      "name": "Uch chinor MFY",
+      "name_ru": null,
+      "name_uz": "Uch chinor MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1660,
+    "fields": {
+      "guid": "6a12d559-5c23-4bdb-9ad4-d0781891c0f3",
+      "created_at": "2024-01-27T17:58:10.646Z",
+      "updated_at": "2024-01-27T17:58:10.646Z",
+      "name": "Ittifoq MFY",
+      "name_ru": null,
+      "name_uz": "Ittifoq MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1661,
+    "fields": {
+      "guid": "a7ece1a1-b766-4c38-905b-7a5e362b0766",
+      "created_at": "2024-01-27T17:58:10.646Z",
+      "updated_at": "2024-01-27T17:58:10.646Z",
+      "name": "G�ishtko�prik MFY",
+      "name_ru": null,
+      "name_uz": "G�ishtko�prik MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1662,
+    "fields": {
+      "guid": "ec226dee-0f9c-47e5-92d2-9150f9695dad",
+      "created_at": "2024-01-27T17:58:10.647Z",
+      "updated_at": "2024-01-27T17:58:10.647Z",
+      "name": "Guliston MFY",
+      "name_ru": null,
+      "name_uz": "Guliston MFY",
+      "district": 206
+    }
+  },
+  {
+    "model": "common.quarter",
+    "pk": 1663,
+    "fields": {
+      "guid": "6c8ba68f-777c-4552-801c-62dd7555a34d",
+      "created_at": "2024-01-27T17:58:10.647Z",
+      "updated_at": "2024-01-27T17:58:10.647Z",
+      "name": "Masalboy MFY",
+      "name_ru": null,
+      "name_uz": "Masalboy MFY",
+      "district": 206
     }
   }
 ]

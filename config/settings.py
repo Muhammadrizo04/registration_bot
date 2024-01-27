@@ -45,11 +45,14 @@ BASE_APPS = [
     'django.contrib.staticfiles',
 ]
 
-THIRD_PARTY_APPS = []
+THIRD_PARTY_APPS = [
+    'modeltranslation',
+]
 
 LOCAL_APPS = [
     'botapp',
     'users',
+    'common',
 ]
 
 INSTALLED_APPS = BASE_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -131,6 +134,23 @@ USE_I18N = True
 
 USE_TZ = True
 
+
+def gettext(s):
+    return s
+
+
+LANGUAGES = (
+    ("ru", gettext("Russian")),
+    ("uz", gettext("Uzbek")),
+)
+
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = "uz"
+MODELTRANSLATION_LANGUAGES = ("ru", "uz")
+
+LOCALE_PATHS = [
+    BASE_DIR.parent / 'locale'
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/

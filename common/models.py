@@ -54,6 +54,7 @@ class District(BaseModel):
             ),
         ]
 
+
 class Quarter(BaseModel):
     name = models.CharField(max_length=250, verbose_name=_("Quarter Name"))
     district = models.ForeignKey(District, on_delete=models.CASCADE, related_name='quarters', verbose_name=_("District"))

@@ -72,10 +72,20 @@ def district_keyboard_ru(region_id):
 def quarter_keyboard_uz(district_id):
     keyboard = types.InlineKeyboardMarkup()
     quarters = Quarter.objects.filter(district_id=district_id)
-    for quarter in quarters:
-        button = types.InlineKeyboardButton(quarter.name_uz, callback_data=f'quarter_{quarter.id}')
+    num_quarters = len(quarters)
+
+    for i in range(0, num_quarters, 5):
+        row = []
+        for j in range(i, min(i + 5, num_quarters)):
+            quarter = quarters[j]
+            button = types.InlineKeyboardButton(quarter.name_uz, callback_data=f'quarter_{quarter.id}')
         keyboard.add(button)
+
+    keyboard.add(types.InlineKeyboardButton("←", callback_data="arrow_left"))
+    keyboard.add(types.InlineKeyboardButton("→", callback_data="arrow_right"))
+
     return keyboard
+
 
 def quarter_keyboard_ru(district_id):
     keyboard = types.InlineKeyboardMarkup()

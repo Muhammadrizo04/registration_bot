@@ -54,11 +54,11 @@ def lang(call):
         if current_language == 'UZ':
             bot.send_message(chat_id, "itimos tuman yoki shaharni tanlang", reply_markup=district_keyboard_uz(region_id))
         elif current_language == 'RU':
-            bot.send_message(chat_id, "itimos tuman yoki shaharni tanlang RU", reply_markup=district_keyboard_ru(region_id))
+            bot.send_message(chat_id, "Выберите свой район или город", reply_markup=district_keyboard_ru(region_id))
 
     elif current_state == "wait_district":
         user = BotUser.objects.get(chat_id=chat_id)
-        district_id = call.data.split('_')[-1]
+        district_id = call.data.split('_')[1]
         district = District.objects.get(pk=district_id)
         user.district = district
         user.user_state = "wait_quarter"
@@ -67,7 +67,8 @@ def lang(call):
         if current_language  == 'UZ':
             bot.send_message(chat_id, "itimos o'z mfyigizni tanlang", reply_markup=quarter_keyboard_uz(district_id))
         elif current_language == 'RU':
-            bot.send_message(chat_id, "itimos o'z mfyigizni tanlang RU", reply_markup=quarter_keyboard_ru(district_id))
+            bot.send_message(chat_id, "выберите общественное собрание вашего района", reply_markup=quarter_keyboard_ru(district_id))
+       
     
     elif current_state == "wait_quarter":
         user = BotUser.objects.get(chat_id=chat_id)
@@ -80,7 +81,9 @@ def lang(call):
         if current_language  == 'UZ':
             bot.send_message(chat_id, "itimos o'z adresingizni kiriting")
         elif current_language == 'RU':
-            bot.send_message(chat_id, "itimos o'z adresingizni kiriting RU")
+            bot.send_message(chat_id, "Пожалуйста, введите ваш адрес")
+            
+
 
 @bot.message_handler(func=lambda message: True, content_types=['contact'])
 def conifrim_phone(message):

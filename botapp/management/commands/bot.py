@@ -6,6 +6,35 @@ from common.models import Region, District, Quarter
 TOKEN = '6584674642:AAG_7MIMMrBiuD_smtd3aJMsofEoCMEXRVk'
 bot = telebot.TeleBot(TOKEN)
 
+selected_regions = {}
+names_per_page = 10
+selected_region_id = None  
+
+############################# quarter filter button #########################################
+
+def create_pagination_buttons(page_number, total_pages, names_queryset):
+    keyboard = types.InlineKeyboardMarkup()
+
+    # Fetch names for the current page from the queryset
+    names_and_ids = [(quarter.name, quarter.id) for quarter in names_queryset[(page_number - 1) * names_per_page:page_number * names_per_page]]
+
+    # Add names buttons
+    for name, quarter_id in names_and_ids:
+        button_text = str(name)  # Convert to string to be safe
+        button = types.InlineKeyboardButton(button_text, callback_data=f"quarter_id_{quarter_id}")
+        keyboard.add(button)
+
+
+    # Add pagination buttons
+    if page_number > 1:
+        keyboard.add(types.InlineKeyboardButton("⬅️ Previous", callback_data=f"page_{page_number - 1}"))
+    if page_number < total_pages:
+        keyboard.add(types.InlineKeyboardButton("Next ➡️", callback_data=f"page_{page_number + 1}"))
+
+    return keyboard
+
+############################# quarter filter button #########################################
+
 @bot.message_handler(commands=['start'])
 def handle_start(message):
     chat_id = message.chat.id
@@ -71,17 +100,32 @@ def lang(call):
        
     
     elif current_state == "wait_quarter":
-        user = BotUser.objects.get(chat_id=chat_id)
-        quarter_id = call.data.split('_')[1]
-        quarter = Quarter.objects.get(pk=quarter_id)
-        user.quarter = quarter
-        user.user_state = "wait_adress"
-        user.save()
-        quarter.save()
-        if current_language  == 'UZ':
-            bot.send_message(chat_id, "itimos o'z adresingizni kiriting")
-        elif current_language == 'RU':
-            bot.send_message(chat_id, "Пожалуйста, введите ваш адрес")
+        if call.data.startswith("district_"):
+            selected_region_id = call.data.split("_")[1]
+            selected_regions[chat_id] = selected_region_id  # Store selected region for this user
+            quarters = Quarter.objects.filter(district_id=selected_region_id)
+            total_pages = (quarters.count() // names_per_page) + ((quarters.count() % names_per_page) > 0)
+            page_number = 1
+            keyboard = create_pagination_buttons(page_number, total_pages, quarters)
+            bot.edit_message_text("Choose a quarter:", chat_id, call.message.message_id, reply_markup=keyboard)
+
+        elif call.data.startswith("page_"):
+            page_number = int(call.data.split("_")[1])
+            selected_region_id = selected_regions.get(chat_id)  # Retrieve the stored selected region for this user
+            if selected_region_id:
+                quarters = Quarter.objects.filter(district_id=selected_region_id)
+                total_pages = (quarters.count() // names_per_page) + ((quarters.count() % names_per_page) > 0)
+                keyboard = create_pagination_buttons(page_number, total_pages, quarters)
+                bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=keyboard)
+
+        elif call.data.startswith("quarter_id_"):
+            user = BotUser.objects.get_or_create(chat_id=chat_id)[0]
+            quarter_id = int(call.data.split("_")[2])
+            quarter = Quarter.objects.get(pk=quarter_id)
+            user.quarter = quarter
+            user.user_state = "wait_adress"
+            user.save()
+            bot.send_message(chat_id, f"iltimos adresingizni kiting")
             
 
 
@@ -133,34 +177,37 @@ def messages(message):
     elif current_state == "wait_second_number":
         user = BotUser.objects.get(chat_id=chat_id)
         user.phone_number = message.text
+        user.user_state="wait_fullname"
         user.save()
 
         if current_language == "UZ":
-            user = BotUser.objects.get(chat_id=chat_id)
-            user.user_state="wait_fullname"
-            user.save()
             bot.send_message(chat_id, "Ism familya sharifni kiriting",reply_markup=ReplyKeyboardRemove(selective=False))
 
         elif current_language == "RU":
-            user = BotUser.objects.get(chat_id=chat_id)
-            user.user_state="wait_fullname"
-            user.save()
             bot.send_message(chat_id, "iltimos ism familya sharifingizni RU",reply_markup=ReplyKeyboardRemove(selective=False))
 
     elif current_state == "wait_fullname":
         user = BotUser.objects.get(chat_id=chat_id)
         user.full_name = message.text
+        user.user_state = "wait_region"
         user.save()
 
         if current_language == "UZ":
-            user = BotUser.objects.get(chat_id=chat_id)
-            user.user_state = "wait_region"
-            user.save()
             bot.send_message(chat_id, "o'z regionigizni tanlang",reply_markup=region_keyboard_uz())
         elif current_language == "RU":
-            user = BotUser.objects.get(chat_id=chat_id)
-            user.user_state = "wait_region"
-            user.save()
             bot.send_message(chat_id, "regioningizni tanlang RU", reply_markup=region_keyboard_ru())
 
+        
+    elif current_state == "wait_adress":
+        user = BotUser.objects.get(chat_id=chat_id)
+        user.adress=message.text
+        user.user_state = "wait_interest"
+        user.save()
+        bot.send_message(chat_id, "o'z qiziqishlaringizni tanlang")
+
 bot.polling(none_stop=True)
+
+
+
+
+

@@ -8,61 +8,25 @@ from common.models import BaseModel, Region, District, Quarter
 
 class Interest(BaseModel):
     name = models.CharField(max_length=250, verbose_name=_("Interest Name"))
+    name_ru = models.CharField(max_length=250, verbose_name=_("Interest Name RU"))
 
     def __str__(self) -> str:
         return self.name
 
-    class Meta:
-        db_table = "interests"
-        """Index for iexact lookups"""
-        indexes = [
-            models.Index(
-                Upper("name_uz").desc(), name="interest_name_uz_upper_index"
-            ),
-            models.Index(
-                Upper("name_ru").desc(), name="interest_name_ru_upper_index"
-            ),
-        ]
 
 
 class Education(BaseModel):
     name = models.CharField(max_length=250, verbose_name=_("Education Name"))
+    name_ru = models.CharField(max_length=250, verbose_name=_("Education Name RU"))
     interest = models.ForeignKey(Interest, on_delete=models.CASCADE, related_name='education', verbose_name=_("Interest"))
 
-    def __str__(self) -> str:
-        return self.name
-
-    class Meta:
-        db_table = "education"
-        """Index for iexact lookup"""
-        indexes = [
-            models.Index(
-                Upper("name_uz").desc(), name="education_name_uz_upper_index"
-            ),
-            models.Index(
-                Upper("name_ru").desc(), name="education_name_ru_upper_index"
-            ),
-        ]
-
-
+   
 class Course(BaseModel):
     name = models.CharField(max_length=250, verbose_name=_("Course Name"))
+    name_ru = models.CharField(max_length=250, verbose_name=_("Course Name RU"))
     education = models.ForeignKey(Education, on_delete=models.CASCADE, related_name='course', verbose_name=_("Education"))
 
-    def __str__(self) -> str:
-        return self.name
-
-    class Meta:
-        db_table = "course"
-        """Index for iexact lookup"""
-        indexes = [
-            models.Index(
-                Upper("name_uz").desc(), name="course_name_uz_upper_index"
-            ),
-            models.Index(
-                Upper("name_ru").desc(), name="course_name_ru_upper_index"
-            ),
-        ]
+    
 
 
 
@@ -82,6 +46,7 @@ class BotUser(BaseModel):
     interest = models.ForeignKey(Interest, on_delete=models.CASCADE, related_name="bot_users", null=True, blank=True)
     education = models.ForeignKey(Education, on_delete=models.CASCADE, related_name="bot_users", null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="bot_users", null=True, blank=True)
+    problems = models.CharField(max_length=100, blank=True)
 
     def __str__(self) -> str:
         return self.full_name

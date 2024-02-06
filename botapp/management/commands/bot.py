@@ -53,14 +53,14 @@ def handle_start(message):
     nick_name = message.chat.first_name
     try:
         user = BotUser.objects.get(chat_id=chat_id)
-        bot.send_message(chat_id, "Ro'yxatga oluvchi botimizga hush kelibsiz", reply_markup=languages())
+        bot.send_message(chat_id, "Salom! Bizning ta'lim va karyeraga bag`ishlangan botimizga xush kelibsiz. Muvaffaqiyatli kelajak sari yo'lda sizga yordam berishga tayyormiz! Keling, siz haqingizda ba'zi muhim narsalarni bilib olaylik. ", reply_markup=languages())
     except BotUser.DoesNotExist:
         BotUser.objects.create(
             chat_id=chat_id,
             nick_name=nick_name,
 
         )
-        bot.send_message(chat_id, "Ro'yxatga oluvchi botimizga hush kelibsiz", reply_markup=languages())
+        bot.send_message(chat_id, "Salom! Bizning ta'lim va karyeraga bag`ishlangan botimizga xush kelibsiz. Muvaffaqiyatli kelajak sari yo'lda sizga yordam berishga tayyormiz! Keling, siz haqingizda ba'zi muhim narsalarni bilib olaylik. ", reply_markup=languages())
 
 @bot.callback_query_handler(func=lambda call: True)
 def lang(call):
@@ -74,14 +74,14 @@ def lang(call):
         user.user_lang = 'UZ'
         user.user_state = "wait_phone"
         user.save()
-        bot.send_message(chat_id, "Iltimos telefon raqamingizni yuboring", reply_markup=contacts_uz())
+        bot.send_message(chat_id, "Endi qo'shimcha ma'lumot kerak bo'lganda siz bilan bog'lanishimiz uchun aloqa telefon raqamingizni baham ko'ring. ", reply_markup=contacts_uz())
 
     elif call.data == "ru":
         user = BotUser.objects.get(chat_id=chat_id)
         user.user_lang = 'RU'
         user.user_state = "wait_phone"
         user.save()
-        bot.send_message(chat_id, "Пожалуйста, поделитесь своим номером телефона", reply_markup=contacts_ru())
+        bot.send_message(chat_id, "Теперь поделитесь своим контактным номером телефона, чтобы мы могли связаться с вами, когда нам понадобится дополнительная информация.", reply_markup=contacts_ru())
     
     elif current_state == "wait_region":
         user = BotUser.objects.get(chat_id=chat_id)
@@ -145,8 +145,11 @@ def lang(call):
             user.quarter = quarter
             user.user_state = "wait_adress"
             user.save()
-            bot.send_message(chat_id, f"iltimos adresingizni kiting")
-            
+            if current_language == 'UZ':
+                bot.send_message(chat_id, "Mas'ul xodimlar siz bilan bog'lanishi uchun aniq yashash manzilingizni ko'rsating.")
+            elif current_language == 'RU':
+                bot.send_message(chat_id, "Укажите свой точный адрес проживания, чтобы ответственный персонал мог связаться с вами.")
+       
     elif current_state == "wait_interest":
         user = BotUser.objects.get(chat_id=chat_id)
         interest_id = call.data.split('_')[1]
@@ -251,9 +254,9 @@ def messages(message):
         user.save()
 
         if current_language == "UZ":
-            bot.send_message(chat_id, "yoshingizni kiriting",reply_markup=ReplyKeyboardRemove(selective=False))
+            bot.send_message(chat_id, "Yoshingiz nechida? Bu bizga ma'lumotlarimizni sizning ehtiyojlaringizga moslashtirishga yordam beradi.",reply_markup=ReplyKeyboardRemove(selective=False))
         elif current_language == "RU":
-            bot.send_message(chat_id, "yoshingizni kiriting RU",reply_markup=ReplyKeyboardRemove(selective=False))
+            bot.send_message(chat_id, "Сколько тебе лет? Это помогает нам адаптировать нашу информацию к вашим потребностям.",reply_markup=ReplyKeyboardRemove(selective=False))
 
     elif current_state == "wait_age":
         user = BotUser.objects.get(chat_id=chat_id)
@@ -271,8 +274,12 @@ def messages(message):
         user.adress=message.text
         user.user_state = "wait_interest"
         user.save()
-        bot.send_message(chat_id, "o'z qiziqishlaringizni tanlang", reply_markup=interest_keyboard())
+        if current_language == "UZ":
+            bot.send_message(chat_id, "Qaysi soha sizni ko'proq qiziqtiradi?", reply_markup=interest_keyboard())
+        elif current_language == "RU":
+            bot.send_message(chat_id, "Какая сфера вас интересует больше всего?", reply_markup=interest_keyboard())
 
+            
 bot.polling(none_stop=True)
 
 

@@ -47,6 +47,7 @@ BASE_APPS = [
 
 THIRD_PARTY_APPS = [
     'modeltranslation',
+    'import_export',
 ]
 
 LOCAL_APPS = [

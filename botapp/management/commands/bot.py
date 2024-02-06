@@ -1,37 +1,49 @@
 import telebot
-from botapp.models import BotUser
+from botapp.models import *
 from .button import *
 from telebot.types import ReplyKeyboardRemove
 from common.models import Region, District, Quarter
+from django.conf import settings
+import os
 TOKEN = '6584674642:AAG_7MIMMrBiuD_smtd3aJMsofEoCMEXRVk'
 bot = telebot.TeleBot(TOKEN)
 
-selected_regions = {}
 names_per_page = 10
-selected_region_id = None  
-
+selected_region_id = None
 ############################# quarter filter button #########################################
 
 def create_pagination_buttons(page_number, total_pages, names_queryset):
-    keyboard = types.InlineKeyboardMarkup()
+    keyboard = types.InlineKeyboardMarkup(row_width=2)  # Set row width to 2 for quarters
 
     # Fetch names for the current page from the queryset
     names_and_ids = [(quarter.name, quarter.id) for quarter in names_queryset[(page_number - 1) * names_per_page:page_number * names_per_page]]
 
-    # Add names buttons
-    for name, quarter_id in names_and_ids:
+    # Create buttons for each quarter and add them in rows
+    for index, (name, quarter_id) in enumerate(names_and_ids):
         button_text = str(name)  # Convert to string to be safe
         button = types.InlineKeyboardButton(button_text, callback_data=f"quarter_id_{quarter_id}")
-        keyboard.add(button)
 
+        # Add the button to the keyboard
+        if index % 2 == 0:  # Start a new row for every even index
+            row = [button]
+            # If it's the last element and alone in the row, add it directly
+            if index == len(names_and_ids) - 1:
+                keyboard.row(button)
+        else:
+            row.append(button)
+            keyboard.row(*row)  # Add a complete row of 2 buttons
 
-    # Add pagination buttons
+    navigation_buttons = []
     if page_number > 1:
-        keyboard.add(types.InlineKeyboardButton("⬅️ Previous", callback_data=f"page_{page_number - 1}"))
+        navigation_buttons.append(types.InlineKeyboardButton("⬅️ Previous", callback_data=f"page_{page_number - 1}"))
     if page_number < total_pages:
-        keyboard.add(types.InlineKeyboardButton("Next ➡️", callback_data=f"page_{page_number + 1}"))
+        navigation_buttons.append(types.InlineKeyboardButton("Next ➡️", callback_data=f"page_{page_number + 1}"))
+    keyboard.row(*navigation_buttons)
 
     return keyboard
+
+
+
 
 ############################# quarter filter button #########################################
 
@@ -81,7 +93,10 @@ def lang(call):
         region.save()
 
         if current_language == 'UZ':
-            bot.send_message(chat_id, "itimos tuman yoki shaharni tanlang", reply_markup=district_keyboard_uz(region_id))
+            photo_path = os.path.join(settings.BASE_DIR, 'media', 'photos', 'astrum.jpg')  # Construct the path to the image
+            with open(photo_path, 'rb') as photo:
+                bot.send_photo(chat_id, photo, "itimos tuman yoki shaharni tanlang",reply_markup=district_keyboard_uz(region_id))
+                # bot.send_message(chat_id, "itimos tuman yoki shaharni tanlang", reply_markup=district_keyboard_uz(region_id))
         elif current_language == 'RU':
             bot.send_message(chat_id, "Выберите свой район или город", reply_markup=district_keyboard_ru(region_id))
 
@@ -90,20 +105,24 @@ def lang(call):
         district_id = call.data.split('_')[1]
         district = District.objects.get(pk=district_id)
         user.district = district
+        user.selected_district_id = district_id
         user.user_state = "wait_quarter"
         user.save()
         district.save()
-        if current_language  == 'UZ':
-            bot.send_message(chat_id, "itimos o'z mfyigizni tanlang", reply_markup=quarter_keyboard_uz(district_id))
+        quarters = Quarter.objects.filter(district_id=district_id)  # Fetch quarters for selected district
+        total_pages = (quarters.count() // names_per_page) + (quarters.count() % names_per_page > 0)
+        page_number = 1  # Start from the first page
+
+        if current_language == 'UZ':
+            bot.send_message(chat_id, "Iltimos o'z MFYingizni tanlang", reply_markup=create_pagination_buttons(page_number, total_pages, quarters))
         elif current_language == 'RU':
-            bot.send_message(chat_id, "выберите общественное собрание вашего района", reply_markup=quarter_keyboard_ru(district_id))
+            bot.send_message(chat_id, "Выберите общественное собрание вашего района", reply_markup=create_pagination_buttons(page_number, total_pages, quarters))
        
     
     elif current_state == "wait_quarter":
         if call.data.startswith("district_"):
-            selected_region_id = call.data.split("_")[1]
-            selected_regions[chat_id] = selected_region_id  # Store selected region for this user
-            quarters = Quarter.objects.filter(district_id=selected_region_id)
+            district_id = call.data.split("_")[1]
+            quarters = Quarter.objects.filter(district_id=district_id)
             total_pages = (quarters.count() // names_per_page) + ((quarters.count() % names_per_page) > 0)
             page_number = 1
             keyboard = create_pagination_buttons(page_number, total_pages, quarters)
@@ -111,12 +130,13 @@ def lang(call):
 
         elif call.data.startswith("page_"):
             page_number = int(call.data.split("_")[1])
-            selected_region_id = selected_regions.get(chat_id)  # Retrieve the stored selected region for this user
-            if selected_region_id:
-                quarters = Quarter.objects.filter(district_id=selected_region_id)
-                total_pages = (quarters.count() // names_per_page) + ((quarters.count() % names_per_page) > 0)
-                keyboard = create_pagination_buttons(page_number, total_pages, quarters)
-                bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=keyboard)
+            user = BotUser.objects.get(chat_id=chat_id)
+            district_id = user.selected_district_id
+            quarters = Quarter.objects.filter(district_id=district_id)
+            total_pages = (quarters.count() // names_per_page) + ((quarters.count() % names_per_page) > 0)
+            keyboard = create_pagination_buttons(page_number, total_pages, quarters)
+            bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=keyboard)
+
 
         elif call.data.startswith("quarter_id_"):
             user = BotUser.objects.get_or_create(chat_id=chat_id)[0]
@@ -127,6 +147,44 @@ def lang(call):
             user.save()
             bot.send_message(chat_id, f"iltimos adresingizni kiting")
             
+    elif current_state == "wait_interest":
+        user = BotUser.objects.get(chat_id=chat_id)
+        interest_id = call.data.split('_')[1]
+        interest = Interest.objects.get(pk=interest_id)
+        user.interest = interest
+        user.user_state = "wait_education"
+        user.save()
+        interest.save()
+        if current_language == 'UZ':
+            bot.send_message(chat_id, "iltimos o'qishni istagan joyingizni tanlang", reply_markup=education_keyboard(interest_id))
+        elif current_language == 'RU':
+            bot.send_message(chat_id, "пожалуйста, выберите место, где вы хотите учиться", reply_markup=education_keyboard(interest_id))
+
+    elif current_state == "wait_education":
+        user = BotUser.objects.get(chat_id=chat_id)
+        education_id = call.data.split('_')[1]
+        education = Education.objects.get(pk=education_id)
+        user.education = education
+        user.user_state = "wait_course"
+        user.save()
+        education.save
+        if current_language == 'UZ':
+            bot.send_message(chat_id, "iltimos o'qishni istagan yo'nalishini tanlang", reply_markup=course_keyboard(education_id))
+        elif current_language == 'RU':
+            bot.send_message(chat_id, "пожалуйста, выберите направление, которое вы хотите изучать", reply_markup=course_keyboard(education_id))
+
+    elif current_state == "wait_course":
+        user = BotUser.objects.get(chat_id=chat_id)
+        course_id = call.data.split('_')[1]
+        course = Course.objects.get(pk=course_id)
+        user.course = course
+        user.user_state = "wait_problems"
+        user.save()
+        course.save()
+        if current_language == 'UZ':
+            bot.send_message(chat_id, "sizda ushbu kurda o'qish uchun qanday muamolar mavjud?")
+        elif current_language == 'RU':
+            bot.send_message(chat_id, "Какие проблемы вам предстоит изучить на этом курсе?")
 
 
 @bot.message_handler(func=lambda message: True, content_types=['contact'])
@@ -203,7 +261,7 @@ def messages(message):
         user.adress=message.text
         user.user_state = "wait_interest"
         user.save()
-        bot.send_message(chat_id, "o'z qiziqishlaringizni tanlang")
+        bot.send_message(chat_id, "o'z qiziqishlaringizni tanlang", reply_markup=interest_keyboard())
 
 bot.polling(none_stop=True)
 

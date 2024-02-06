@@ -1,6 +1,7 @@
 from telebot import types
 
 from common.models import Region, District, Quarter
+from botapp.models import *
 
 def confirm_uz():
     button = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -66,5 +67,29 @@ def district_keyboard_ru(region_id):
     districts = District.objects.filter(region_id=region_id)
     for district in districts:
         button = types.InlineKeyboardButton(district.name_ru, callback_data=f'district_{district.id}')
+        keyboard.add(button)
+    return keyboard
+
+def interest_keyboard():
+    keyboard = types.InlineKeyboardMarkup()
+    interests = Interest.objects.all()
+    for interest in interests:
+        button = types.InlineKeyboardButton(interest.name, callback_data=f"interest_{interest.id}")
+        keyboard.add(button)
+    return keyboard
+
+def education_keyboard(interest_id):
+    keyboard = types.InlineKeyboardMarkup()
+    educations = Education.objects.filter(interest_id=interest_id)
+    for education in educations:
+        button = types.InlineKeyboardButton(education.name, callback_data=f"education_{education.id}")
+        keyboard.add(button)
+    return keyboard
+
+def course_keyboard(education_id):
+    keyboard = types.InlineKeyboardMarkup()
+    courses = Course.objects.filter(education_id=education_id)
+    for course in courses:
+        button = types.InlineKeyboardButton(course.name, callback_data=f"course_{course.id}")
         keyboard.add(button)
     return keyboard

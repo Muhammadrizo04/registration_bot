@@ -72,6 +72,7 @@ class BotUser(BaseModel):
     nick_name = models.CharField(max_length=120)
     user_lang = models.CharField(max_length=3, blank=True)
     phone_number = models.CharField(max_length=16, blank=True)
+    age = models.CharField(max_length=20, blank=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, related_name="bot_users", null=True, blank=True)
     district = models.ForeignKey(District, on_delete=models.CASCADE, related_name="bot_users", null=True, blank=True)
     quarter = models.ForeignKey(Quarter, on_delete=models.CASCADE, related_name="bot_users", null=True, blank=True)

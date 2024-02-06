@@ -57,18 +57,31 @@ def region_keyboard_ru():
 def district_keyboard_uz(region_id):
     keyboard = types.InlineKeyboardMarkup()
     districts = District.objects.filter(region_id=region_id)
+    buttons = []  
     for district in districts:
         button = types.InlineKeyboardButton(district.name_uz, callback_data=f'district_{district.id}')
-        keyboard.add(button)
+        buttons.append(button)
+    while buttons:
+        row = buttons[:2] 
+        keyboard.add(*row)  
+        buttons = buttons[2:] 
+
     return keyboard
 
 def district_keyboard_ru(region_id):
-    keyboard = types.InlineKeyboardMarkup()
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
     districts = District.objects.filter(region_id=region_id)
+    buttons = []  
     for district in districts:
         button = types.InlineKeyboardButton(district.name_ru, callback_data=f'district_{district.id}')
-        keyboard.add(button)
+        buttons.append(button)
+    while buttons:
+        row = buttons[:2] 
+        keyboard.add(*row)  
+        buttons = buttons[2:] 
+
     return keyboard
+
 
 def interest_keyboard():
     keyboard = types.InlineKeyboardMarkup()

@@ -247,15 +247,25 @@ def messages(message):
     elif current_state == "wait_fullname":
         user = BotUser.objects.get(chat_id=chat_id)
         user.full_name = message.text
-        user.user_state = "wait_region"
+        user.user_state = "wait_age"
         user.save()
 
         if current_language == "UZ":
+            bot.send_message(chat_id, "yoshingizni kiriting",reply_markup=ReplyKeyboardRemove(selective=False))
+        elif current_language == "RU":
+            bot.send_message(chat_id, "yoshingizni kiriting RU",reply_markup=ReplyKeyboardRemove(selective=False))
+
+    elif current_state == "wait_age":
+        user = BotUser.objects.get(chat_id=chat_id)
+        user.age = message.text
+        user.user_state = "wait_adress"
+        user.save()
+        if current_language == "UZ":
             bot.send_message(chat_id, "o'z regionigizni tanlang",reply_markup=region_keyboard_uz())
         elif current_language == "RU":
-            bot.send_message(chat_id, "regioningizni tanlang RU", reply_markup=region_keyboard_ru())
+            bot.send_message(chat_id, "o'z regionigizni tanlang Ru",reply_markup=region_keyboard_ru())
 
-        
+
     elif current_state == "wait_adress":
         user = BotUser.objects.get(chat_id=chat_id)
         user.adress=message.text

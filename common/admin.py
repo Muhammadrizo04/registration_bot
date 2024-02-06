@@ -31,23 +31,23 @@ class QuarterInline(admin.TabularInline):
 class RegionAdmin(ImportExportModelAdmin):
     resource_class = RegionResource
     inlines = [DistrictInline]
-    list_display = ('name', )
-    search_fields = ('name', )
+    list_display = ('name_uz', 'name_ru')
+    search_fields = ('name_uz', 'name_ru')
 
 
 class DistrictAdmin(ImportExportModelAdmin):
     resource_class = DistrictResource
-    list_display = ('name', 'region')
+    list_display = ('name_uz', 'name_ru', 'region')
     list_filter = ('region', )
-    search_fields = ('name', )
+    search_fields = ('name_uz', 'name_ru' )
     inlines = [QuarterInline]
 
 
 class QuarterAdmin(ImportExportModelAdmin):
     resource_class = QuarterResource
-    list_display = ('name', 'district')
+    list_display = ('name_uz', 'name_ru', 'district')
     list_filter = ('district', )
-    search_fields = ('name', )
+    search_fields = ('name_uz', 'name_ru')
 
 
 admin.site.register(Region, RegionAdmin)

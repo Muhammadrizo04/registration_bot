@@ -5,6 +5,7 @@ from .models import Region, District, Quarter
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
+from django.core.exceptions import ObjectDoesNotExist
 
 class RegionResource(resources.ModelResource):
     class Meta:
@@ -13,6 +14,7 @@ class RegionResource(resources.ModelResource):
 class DistrictResource(resources.ModelResource):
     class Meta:
         model = District
+    
 
 class QuarterResource(resources.ModelResource):
     class Meta:

@@ -7,10 +7,10 @@ from django.utils.translation import gettext_lazy as _
 
 class BaseModel(models.Model):
     guid = models.UUIDField(
-        unique=True, default=uuid.uuid4, editable=False, db_index=True
+        unique=True, default=uuid.uuid4, editable=False, db_index=True, blank=True
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
         abstract = True

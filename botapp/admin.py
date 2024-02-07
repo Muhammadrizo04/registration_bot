@@ -6,26 +6,39 @@ class EducationInline(admin.TabularInline):
     extra = 1
 
 
+class CategoryInline(admin.TabularInline):
+    model = Category
+    extra = 1
+
 class CourseInline(admin.TabularInline):
     model = Course
-    extra = 1
+    extra = 2
 
 class InterestAdmin(admin.ModelAdmin):
     inlines = [EducationInline]
-    list_display = ('name', )
-    search_fields = ('name', )
+    list_display = ('name_uz', )
+    search_fields = ('name_uz', )
 
 class EducationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'interest')
+    list_display = ('name_uz', 'interest')
     list_filter = ('interest', )
-    search_fields = ('name', )
+    search_fields = ('name_uz', )
+    inlines = [CategoryInline]
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name_uz', 'name_ru', 'education')
+    list_filter = ('education',)
+    search_fields = ('name_uz',)
     inlines = [CourseInline]
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'education')
-    list_filter = ('education', )
-    search_fields = ('name', )
+    list_display = ('name_uz', 'category')
+    list_filter = ('category', )
+    search_fields = ('name_uz', )
 
+
+class ProblemAdmin(admin.ModelAdmin):
+    list_display = ('name_uz', 'name_ru')
 
 
 class BotUserAdmin(admin.ModelAdmin):
@@ -34,5 +47,7 @@ class BotUserAdmin(admin.ModelAdmin):
 
 admin.site.register(Interest, InterestAdmin)
 admin.site.register(Education, EducationAdmin)
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(BotUser, BotUserAdmin)
+admin.site.register(Problem, ProblemAdmin)

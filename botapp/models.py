@@ -7,26 +7,46 @@ from common.models import BaseModel, Region, District, Quarter
 
 
 class Interest(BaseModel):
-    name = models.CharField(max_length=250, verbose_name=_("Interest Name"))
+    name_uz = models.CharField(max_length=250, verbose_name=_("Interest Name"))
     name_ru = models.CharField(max_length=250, verbose_name=_("Interest Name RU"))
 
     def __str__(self) -> str:
-        return self.name
+        return self.name_uz
 
 
 
 class Education(BaseModel):
-    name = models.CharField(max_length=250, verbose_name=_("Education Name"))
+    name_uz = models.CharField(max_length=250, verbose_name=_("Education Name"))
     name_ru = models.CharField(max_length=250, verbose_name=_("Education Name RU"))
     interest = models.ForeignKey(Interest, on_delete=models.CASCADE, related_name='education', verbose_name=_("Interest"))
 
-   
-class Course(BaseModel):
-    name = models.CharField(max_length=250, verbose_name=_("Course Name"))
-    name_ru = models.CharField(max_length=250, verbose_name=_("Course Name RU"))
-    education = models.ForeignKey(Education, on_delete=models.CASCADE, related_name='course', verbose_name=_("Education"))
+    def __str__(self) -> str:
+        return self.name_uz
 
+class Category(BaseModel):
+    name_uz = models.CharField(max_length=250, verbose_name=_("Category Name"))
+    name_ru = models.CharField(max_length=250, verbose_name=_("Category Name RU"))
+    education = models.ForeignKey(Education, on_delete=models.CASCADE, related_name='category', verbose_name=_("Education"))
+
+
+    def __str__(self) -> str:
+        return self.name_uz
     
+
+class Course(BaseModel):
+    name_uz = models.CharField(max_length=250, verbose_name=_("Course Name"))
+    name_ru = models.CharField(max_length=250, verbose_name=_("Course Name RU"))
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='course', verbose_name=_("Education"))
+
+    def __str__(self) -> str:
+        return self.name_uz
+
+class Problem(BaseModel):
+    name_uz = models.CharField(max_length=100, verbose_name="Problem Name")
+    name_ru = models.CharField(max_length=100, verbose_name="Problem Name RU")
+
+    def __str__(self) -> str:
+        return self.name_uz
 
 
 
@@ -45,8 +65,9 @@ class BotUser(BaseModel):
     selected_district_id = models.CharField(max_length = 10)
     interest = models.ForeignKey(Interest, on_delete=models.CASCADE, related_name="bot_users", null=True, blank=True)
     education = models.ForeignKey(Education, on_delete=models.CASCADE, related_name="bot_users", null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="bot_users", null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="bot_users", null=True, blank=True)
-    problems = models.CharField(max_length=100, blank=True)
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name="bot_users", null=True, blank=True)
 
     def __str__(self) -> str:
         return self.full_name

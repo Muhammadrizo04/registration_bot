@@ -1,0 +1,24 @@
+[
+  {
+    "model": "common.region",
+    "pk": 1,
+    "fields": {
+      "guid": "733e1eda-5c0e-42e1-85c1-1184976e1e3f",
+      "created_at": "2024-02-06T07:30:15.019Z",
+      "updated_at": "2024-02-06T07:30:15.019Z",
+      "name_uz": "Toshkent shahri",
+      "name_ru": "����� �������"
+    }
+  },
+  {
+    "model": "common.region",
+    "pk": 2,
+    "fields": {
+      "guid": "a91973cb-41f5-4eaa-9f06-1e4a0c343d15",
+      "created_at": "2024-02-06T07:30:15.021Z",
+      "updated_at": "2024-02-06T07:30:15.021Z",
+      "name_uz": "Toshkent viloyati",
+      "name_ru": "����������� �������"
+    }
+  }
+]

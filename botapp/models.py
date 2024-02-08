@@ -42,11 +42,23 @@ class Course(BaseModel):
         return self.name_uz
 
 class Problem(BaseModel):
-    name_uz = models.CharField(max_length=100, verbose_name="Problem Name")
-    name_ru = models.CharField(max_length=100, verbose_name="Problem Name RU")
+    name = models.CharField(max_length=250, verbose_name=_("Problem Name"))
 
     def __str__(self) -> str:
-        return self.name_uz
+        return self.name
+
+    class Meta:
+        db_table = "problems"
+        """Index for iexact lookups"""
+        indexes = [
+            models.Index(
+                Upper("name_uz").desc(), name="problem_name_uz_upper_index"
+            ),
+            models.Index(
+                Upper("name_ru").desc(), name="problem_name_ru_upper_index"
+            ),
+        ]
+
 
 
 

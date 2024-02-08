@@ -4,16 +4,16 @@ from common.models import Region, District, Quarter
 from botapp.models import *
 
 def confirm_uz():
-    button = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    yes = types.KeyboardButton(text="Ha✅")
-    no = types.KeyboardButton(text="Yo'q❌")
+    button = types.InlineKeyboardMarkup()
+    yes = types.InlineKeyboardButton(text="Ha✅", callback_data="confirm_uz")
+    no = types.InlineKeyboardButton(text="Yo'q❌", callback_data="cancel_uz")
     button.add(yes, no)
     return button
 
 def confirm_ru():
-    button = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    yes = types.KeyboardButton(text="Да✅")
-    no = types.KeyboardButton(text="Нет❌")
+    button = types.InlineKeyboardMarkup()
+    yes = types.InlineKeyboardButton(text="Да✅", callback_data="confirm_ru")
+    no = types.InlineKeyboardButton(text="Нет❌", callback_data="cancel_ru")
     button.add(yes, no)
     return button
 
@@ -40,7 +40,7 @@ def contacts_ru():
 
 def region_keyboard_uz():
     keyboard = types.InlineKeyboardMarkup()
-    regions = Region.objects.all()
+    regions = Region.objects.all().order_by('name_uz')
     for region in regions:
         button = types.InlineKeyboardButton(region.name_uz, callback_data=f'region_{region.id}')
         keyboard.add(button)
@@ -48,7 +48,7 @@ def region_keyboard_uz():
 
 def region_keyboard_ru():
     keyboard = types.InlineKeyboardMarkup()
-    regions = Region.objects.all()
+    regions = Region.objects.all().order_by('name_ru')
     for region in regions:
         button = types.InlineKeyboardButton(region.name_ru, callback_data=f'region_{region.id}')
         keyboard.add(button)
@@ -56,7 +56,7 @@ def region_keyboard_ru():
 
 def district_keyboard_uz(region_id):
     keyboard = types.InlineKeyboardMarkup()
-    districts = District.objects.filter(region_id=region_id)
+    districts = District.objects.filter(region_id=region_id).order_by('name_uz')
     buttons = []  
     for district in districts:
         button = types.InlineKeyboardButton(district.name_uz, callback_data=f'district_{district.id}')
@@ -70,7 +70,7 @@ def district_keyboard_uz(region_id):
 
 def district_keyboard_ru(region_id):
     keyboard = types.InlineKeyboardMarkup(row_width=2)
-    districts = District.objects.filter(region_id=region_id)
+    districts = District.objects.filter(region_id=region_id).order_by('name_ru')
     buttons = []  
     for district in districts:
         button = types.InlineKeyboardButton(district.name_ru, callback_data=f'district_{district.id}')
@@ -83,26 +83,75 @@ def district_keyboard_ru(region_id):
     return keyboard
 
 
-def interest_keyboard():
+def interest_keyboard_uz():
     keyboard = types.InlineKeyboardMarkup()
-    interests = Interest.objects.all()
+    interests = Interest.objects.all().order_by('name_uz')
     for interest in interests:
-        button = types.InlineKeyboardButton(interest.name, callback_data=f"interest_{interest.id}")
+        button = types.InlineKeyboardButton(interest.name_uz, callback_data=f"interest_{interest.id}")
+        keyboard.add(button)
+    return keyboard
+
+def interest_keyboard_ru():
+    keyboard = types.InlineKeyboardMarkup()
+    interests = Interest.objects.all().order_by('name_ru')
+    for interest in interests:
+        button = types.InlineKeyboardButton(interest.name_ru, callback_data=f"interest_{interest.id}")
         keyboard.add(button)
     return keyboard
 
 def education_keyboard(interest_id):
     keyboard = types.InlineKeyboardMarkup()
-    educations = Education.objects.filter(interest_id=interest_id)
+    educations = Education.objects.filter(interest_id=interest_id).order_by('name_uz')
     for education in educations:
-        button = types.InlineKeyboardButton(education.name, callback_data=f"education_{education.id}")
+        button = types.InlineKeyboardButton(education.name_uz, callback_data=f"education_{education.id}")
         keyboard.add(button)
     return keyboard
 
-def course_keyboard(education_id):
+
+def category_keyboard_uz(education_id):
     keyboard = types.InlineKeyboardMarkup()
-    courses = Course.objects.filter(education_id=education_id)
+    categorys = Category.objects.filter(education_id=education_id).order_by('name_uz')
+    for category in categorys:
+        button = types.InlineKeyboardButton(category.name_uz, callback_data=f"category_{category.id}")
+        keyboard.add(button)
+    return keyboard
+
+def category_keyboard_ru(education_id):
+    keyboard = types.InlineKeyboardMarkup()
+    categorys = Category.objects.filter(education_id=education_id).order_by('name_ru')
+    for category in categorys:
+        button = types.InlineKeyboardButton(category.name_ru, callback_data=f"category_{category.id}")
+        keyboard.add(button)
+    return keyboard
+
+def course_keyboard_uz(category_id):
+    keyboard = types.InlineKeyboardMarkup()
+    courses = Course.objects.filter(category_id=category_id).order_by('name_uz')
     for course in courses:
-        button = types.InlineKeyboardButton(course.name, callback_data=f"course_{course.id}")
+        button = types.InlineKeyboardButton(course.name_uz, callback_data=f"course_{course.id}")
+        keyboard.add(button)
+    return keyboard
+
+def course_keyboard_ru(category_id):
+    keyboard = types.InlineKeyboardMarkup()
+    courses = Course.objects.filter(category_id=category_id).order_by('name_ru')
+    for course in courses:
+        button = types.InlineKeyboardButton(course.name_ru, callback_data=f"course_{course.id}")
+        keyboard.add(button)
+    return keyboard
+
+def problem_keyboard_uz():
+    keyboard = types.InlineKeyboardMarkup()
+    problems = Problem.objects.all().order_by('name_uz')
+    for problem in problems:
+        button = types.InlineKeyboardButton(problem.name_uz, callback_data=f"problem_{problem.id}")
+        keyboard.add(button)
+    return keyboard
+
+def problem_keyboard_ru():
+    keyboard = types.InlineKeyboardMarkup()
+    problems = Problem.objects.all().order_by('name_ru')
+    for problem in problems:
+        button = types.InlineKeyboardButton(problem.name_ru, callback_data=f"problem_{problem.id}")
         keyboard.add(button)
     return keyboard

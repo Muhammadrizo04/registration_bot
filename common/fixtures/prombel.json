@@ -1,0 +1,101 @@
+[
+  {
+    "model": "botapp.problem",
+    "pk": 1,
+    "fields": {
+      "guid": "cd8111fb-9cf2-4d9c-ba3d-d504d5213c8d",
+      "created_at": "2024-02-07T10:01:51.251Z",
+      "updated_at": "2024-02-07T10:01:51.251Z",
+      "name_uz": "Moliyaviy qiyinchiliklar",
+      "name_ru": "���������� ��������"
+    }
+  },
+  {
+    "model": "botapp.problem",
+    "pk": 2,
+    "fields": {
+      "guid": "8f8d0b4e-598b-467a-a1ec-9f6e7db32560",
+      "created_at": "2024-02-07T10:02:10.308Z",
+      "updated_at": "2024-02-07T10:02:10.308Z",
+      "name_uz": "Uydan ta�lim muassasasigacha bo�lgan uzoq masofa.",
+      "name_ru": "������� ���������� �� ���� �� �������� ���������."
+    }
+  },
+  {
+    "model": "botapp.problem",
+    "pk": 3,
+    "fields": {
+      "guid": "a2c9f808-5ae1-4be4-806e-21f07c31064d",
+      "created_at": "2024-02-07T10:02:27.075Z",
+      "updated_at": "2024-02-07T10:06:52.086Z",
+      "name_uz": "Transportdagi qiyinchiliklar.",
+      "name_ru": "�������� � ����������"
+    }
+  },
+  {
+    "model": "botapp.problem",
+    "pk": 4,
+    "fields": {
+      "guid": "850a75f3-8dfb-4c35-8071-b4b01bbad54d",
+      "created_at": "2024-02-07T10:02:40.011Z",
+      "updated_at": "2024-02-07T10:02:40.011Z",
+      "name_uz": "Boshqa tilni o�rganishda qiyinchilik.",
+      "name_ru": "��������� � �������� ������� �����."
+    }
+  },
+  {
+    "model": "botapp.problem",
+    "pk": 5,
+    "fields": {
+      "guid": "81eb2dc0-8c2c-4b66-80f7-6cc23921b778",
+      "created_at": "2024-02-07T10:02:53.678Z",
+      "updated_at": "2024-02-07T10:02:53.678Z",
+      "name_uz": "Tanlangan ta�lim sohasi haqida xabardorlikning yo�qligi.",
+      "name_ru": "������������� ��������������� � ��������� ������� ��������."
+    }
+  },
+  {
+    "model": "botapp.problem",
+    "pk": 6,
+    "fields": {
+      "guid": "781fc192-2e4a-4249-89e1-dd4d55351a77",
+      "created_at": "2024-02-07T10:03:05.932Z",
+      "updated_at": "2024-02-07T10:03:05.932Z",
+      "name_uz": "Aniq ta�lim muassasasi haqida ma�lumotlarning yo�qligi.",
+      "name_ru": "���������� ���������� � ���������� ������� ���������."
+    }
+  },
+  {
+    "model": "botapp.problem",
+    "pk": 7,
+    "fields": {
+      "guid": "35b9c938-16ff-48c2-90a9-ede6c9eac976",
+      "created_at": "2024-02-07T10:03:21.873Z",
+      "updated_at": "2024-02-07T10:03:21.873Z",
+      "name_uz": "Tanlangan sohaning kelajakdagi karyera perspektivalarini yetarlicha tushunmaslik",
+      "name_ru": "������������� ��������� ������� ��������� ���������� ��������� �������."
+    }
+  },
+  {
+    "model": "botapp.problem",
+    "pk": 8,
+    "fields": {
+      "guid": "1bb6bbbc-ee46-4b10-85b1-f6af5f71cc78",
+      "created_at": "2024-02-07T10:03:32.145Z",
+      "updated_at": "2024-02-07T10:03:32.145Z",
+      "name_uz": "Tanlangan soha doirasida aniq ixtisoslikni tanlashda noaniqlik.",
+      "name_ru": "������������� � ������ ���������� ������������� � ������ ��������� �������."
+    }
+  },
+  {
+    "model": "botapp.problem",
+    "pk": 9,
+    "fields": {
+      "guid": "01303450-fdd5-4593-bd57-196e9e68de55",
+      "created_at": "2024-02-07T10:03:42.070Z",
+      "updated_at": "2024-02-07T10:03:42.070Z",
+      "name_uz": "Oilada yordamning yo'qligi yoki kasb tanlashda nizolar.",
+      "name_ru": "���������� ��������� � ����� ��� ��������� ��� ������ ���������."
+    }
+  }
+]

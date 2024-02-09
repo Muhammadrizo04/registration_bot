@@ -23,11 +23,10 @@ class EducationAdmin(admin.ModelAdmin):
     list_display = ('name_uz', 'interest')
     list_filter = ('interest', )
     search_fields = ('name_uz', )
-    inlines = [CategoryInline]
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name_uz', 'name_ru', 'education')
-    list_filter = ('education',)
+    list_display = ('name_uz', 'name_ru',)
+    list_filter = ('interest',)
     search_fields = ('name_uz',)
     inlines = [CourseInline]
 

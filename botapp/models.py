@@ -26,7 +26,7 @@ class Education(BaseModel):
 class Category(BaseModel):
     name_uz = models.CharField(max_length=250, verbose_name=_("Category Name"))
     name_ru = models.CharField(max_length=250, verbose_name=_("Category Name RU"))
-    education = models.ForeignKey(Education, on_delete=models.CASCADE, related_name='category', verbose_name=_("Education"))
+    interest = models.ForeignKey(Interest, on_delete=models.CASCADE, related_name='category', verbose_name=_("Interest"))
 
 
     def __str__(self) -> str:

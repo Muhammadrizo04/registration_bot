@@ -183,7 +183,7 @@ def lang(call):
 
         elif call.data == "back_to_district":
             user = BotUser.objects.get_or_create(chat_id=chat_id)[0]
-            region_id = user.region_id
+            region_id = user.region
             user.user_state = "wait_district"
             user.save()
             if current_language == 'UZ':
@@ -198,7 +198,45 @@ def lang(call):
             user = BotUser.objects.get_or_create(chat_id=chat_id)[0]
             quarter_id = int(call.data.split("_")[2])
             quarter = Quarter.objects.get(pk=quarter_id)
+            region = user.region
+            district = user.district
             user.quarter = quarter
+            user.user_state = "confirm_quarter"
+            user.save()
+            if current_language == 'UZ':
+                bot.edit_message_text(f"Siz {region}, {district}, {quarter} ni tanladingiz o'zgartirishni hohlaysizmi?",
+                                      chat_id, call.message.message_id, reply_markup=confirm_uz())
+                # photo_path = os.path.join(settings.BASE_DIR, 'media', 'photos',
+                #                           'astrum.jpg')  # Construct the path to the image
+                # with open(photo_path, 'rb') as photo:
+                #     bot.send_photo(chat_id, photo,
+                #                    "Mas'ul xodimlar siz bilan bog'lanishi uchun aniq yashash manzilingizni ko'rsating.")
+            elif current_language == 'RU':
+                bot.edit_message_text(f"Вы выбрали {region}, {district}, {quarter} Хотите изменить?",
+                                      chat_id, call.message.message_id, reply_markup=confirm_ru())
+                # photo_path = os.path.join(settings.BASE_DIR, 'media', 'photos',
+                #                           'astrum.jpg')  # Construct the path to the image
+                # with open(photo_path, 'rb') as photo:
+                #     bot.send_photo(chat_id, photo,
+                #                    "Укажите свой точный адрес проживания, чтобы ответственный персонал мог связаться с вами.")
+                    
+    elif current_state == "confirm_quarter":
+        if call.data == "confirm_uz":
+            user = BotUser.objects.get(chat_id=chat_id)
+            user.user_state = "wait_region"
+            user.save()
+            bot.edit_message_text("regionnigizni tanlang",
+                                  chat_id, call.message.message_id, reply_markup=region_keyboard_uz())
+            
+        elif call.data == "confirm_ru":
+            user = BotUser.objects.get(chat_id=chat_id)
+            user.user_state = "wait_region"
+            user.save()
+            bot.edit_message_text("выберите ваш регион",
+                                  chat_id, call.message.message_id, reply_markup=region_keyboard_ru())
+        
+        elif call.data == "cancel_uz" or call.data == "cancel_ru":
+            user = BotUser.objects.get(chat_id=chat_id)
             user.user_state = "wait_adress"
             user.save()
             if current_language == 'UZ':
@@ -207,6 +245,7 @@ def lang(call):
                 with open(photo_path, 'rb') as photo:
                     bot.send_photo(chat_id, photo,
                                    "Mas'ul xodimlar siz bilan bog'lanishi uchun aniq yashash manzilingizni ko'rsating.")
+
             elif current_language == 'RU':
                 photo_path = os.path.join(settings.BASE_DIR, 'media', 'photos',
                                           'astrum.jpg')  # Construct the path to the image
@@ -232,49 +271,80 @@ def lang(call):
     elif current_state == "wait_education":
         user = BotUser.objects.get(chat_id=chat_id)
         education_id = call.data.split('_')[1]
-        education = Education.objects.get(pk=education_id)
-        user.education = education
-        user.user_state = "wait_category"
-        user.save()
-        education.save()
-        if current_language == 'UZ':
-            bot.edit_message_text("Qaysi yo'nalishda o'qishni hohlaysiz", chat_id, call.message.message_id,
-                                  reply_markup=category_keyboard_uz(education_id))
-        elif current_language == 'RU':
-            bot.edit_message_text("В каком направлении вы хотите учиться", chat_id, call.message.message_id,
-                                  reply_markup=category_keyboard_ru(education_id))
+        if call.data == "back_to_regions":
+            user.user_state = "wait_interest"
+            if current_language == "UZ":
+                bot.edit_message_text("Qaysi soha sizni ko'proq qiziqtiradi? Bir yoki bir nechta variantni tanlang: ",chat_id, call.message.message_id,
+                             reply_markup=interest_keyboard_uz())
+            elif current_language == "RU":
+                bot.edit_message_text("Какая сфера вас интересует больше всего? Выберите один или несколько вариантов:",chat_id, call.message.message_id,
+                             reply_markup=interest_keyboard_ru())
+        else:
+            education = Education.objects.get(pk=education_id)
+            user.education = education
+            interest_id = user.interest
+            user.user_state = "wait_category"
+            user.save()
+            education.save()
+            if current_language == 'UZ':
+                bot.edit_message_text("Qaysi yo'nalishda o'qishni hohlaysiz", chat_id, call.message.message_id,
+                                    reply_markup=category_keyboard_uz(interest_id))
+            elif current_language == 'RU':
+                bot.edit_message_text("В каком направлении вы хотите учиться", chat_id, call.message.message_id,
+                                    reply_markup=category_keyboard_ru(interest_id))
+        
 
     elif current_state == "wait_category":
         user = BotUser.objects.get(chat_id=chat_id)
         category_id = call.data.split('_')[1]
-        category = Category.objects.get(pk=category_id)
-        user.category = category
-        user.user_state = "wait_course"
-        user.save()
-        category.save()
-        if current_language == 'UZ':
-            bot.edit_message_text("qaysi kursda o'qishni hohlaysiz", chat_id, call.message.message_id,
-                                  reply_markup=course_keyboard_uz(category_id))
-        elif current_language == 'RU':
-            bot.edit_message_text("какой курс вы хотите изучать", chat_id, call.message.message_id,
-                                  reply_markup=course_keyboard_ru(category_id))
+        interest_id = user.interest
+        if call.data == "back_to_regions":
+            user.user_state = "wait_education"
+            if current_language == 'UZ':
+                bot.edit_message_text("Qayerda o'qishni hohlaysiz", chat_id, call.message.message_id,
+                                    reply_markup=education_keyboard(interest_id))
+            elif current_language == 'RU':
+                bot.edit_message_text("Где вы хотите учиться?", chat_id, call.message.message_id,
+                                    reply_markup=education_keyboard(interest_id))
+        else:
+            category = Category.objects.get(pk=category_id)
+            user.category = category
+            user.user_state = "wait_course"
+            user.save()
+            category.save()
+            if current_language == 'UZ':
+                bot.edit_message_text("qaysi kursda o'qishni hohlaysiz", chat_id, call.message.message_id,
+                                    reply_markup=course_keyboard_uz(category_id))
+            elif current_language == 'RU':
+                bot.edit_message_text("какой курс вы хотите изучать", chat_id, call.message.message_id,
+                                    reply_markup=course_keyboard_ru(category_id))
 
 
 
     elif current_state == "wait_course":
         user = BotUser.objects.get(chat_id=chat_id)
         course_id = call.data.split('_')[1]
-        course = Course.objects.get(pk=course_id)
-        user.course = course
-        user.user_state = "wait_change"
-        user.save()
-        course.save()
-        if current_language == 'UZ':
-            bot.edit_message_text("Yana biror sohaga qiziqishingiz mavjudmi?", chat_id, call.message.message_id,
-                                  reply_markup=confirm_uz())
-        elif current_language == "RU":
-            bot.edit_message_text("Вас интересует другая сфера?", chat_id, call.message.message_id,
-                                  reply_markup=confirm_ru())
+        interest_id = user.interest
+        if call.data == "back_to_regions":
+            user.user_state = "wait_category"
+            if current_language == 'UZ':
+                bot.edit_message_text("Qayerda o'qishni hohlaysiz", chat_id, call.message.message_id,
+                                    reply_markup=category_keyboard_uz(interest_id))
+            elif current_language == 'RU':
+                bot.edit_message_text("Где вы хотите учиться?", chat_id, call.message.message_id,
+                                    reply_markup=category_keyboard_ru(interest_id))
+        else:
+            course = Course.objects.get(pk=course_id)
+            user.course = course
+            user.user_state = "wait_change"
+            user.save()
+            course.save()
+            if current_language == 'UZ':
+                bot.edit_message_text(f"Siz {course} ni tanladingiz, yana biror sohaga qiziqishingiz mavjudmi?", chat_id, call.message.message_id,
+                                    reply_markup=confirm_uz())
+            elif current_language == "RU":
+                bot.edit_message_text(f"Вы вибрали {course}, вас интересует другая сфера?", chat_id, call.message.message_id,
+                                    reply_markup=confirm_ru())
 
     elif current_state == "wait_change":
         user = BotUser.objects.get(chat_id=chat_id)
@@ -317,49 +387,79 @@ def lang(call):
     elif current_state == "add_education":
         user = BotUser.objects.get(chat_id=chat_id)
         education_id = call.data.split('_')[1]
-        education = Education.objects.get(pk=education_id)
-        user.education_2 = education
-        user.user_state = "add_category"
-        user.save()
-        education.save()
-        if current_language == 'UZ':
-            bot.edit_message_text("Qaysi yo'nalishda o'qishni hohlaysiz", chat_id, call.message.message_id,
-                                  reply_markup=category_keyboard_uz(education_id))
-        elif current_language == 'RU':
-            bot.edit_message_text("В каком направлении вы хотите учиться", chat_id, call.message.message_id,
-                                  reply_markup=category_keyboard_ru(education_id))
+        if call.data == "back_to_regions":
+            user.user_state = "add_interest"
+            if current_language == "UZ":
+                bot.edit_message_text("Qaysi soha sizni ko'proq qiziqtiradi? Bir yoki bir nechta variantni tanlang: ",chat_id, call.message.message_id,
+                             reply_markup=interest_keyboard_uz())
+            elif current_language == "RU":
+                bot.edit_message_text("Какая сфера вас интересует больше всего? Выберите один или несколько вариантов:",chat_id, call.message.message_id,
+                             reply_markup=interest_keyboard_ru())
+        else:
+            education = Education.objects.get(pk=education_id)
+            user.education_2 = education
+            interest_id = user.interest_2
+            user.user_state = "add_category"
+            user.save()
+            education.save()
+            if current_language == 'UZ':
+                bot.edit_message_text("Qaysi yo'nalishda o'qishni hohlaysiz", chat_id, call.message.message_id,
+                                    reply_markup=category_keyboard_uz(interest_id))
+            elif current_language == 'RU':
+                bot.edit_message_text("В каком направлении вы хотите учиться", chat_id, call.message.message_id,
+                                    reply_markup=category_keyboard_ru(interest_id))
 
     elif current_state == "add_category":
         user = BotUser.objects.get(chat_id=chat_id)
         category_id = call.data.split('_')[1]
-        category = Category.objects.get(pk=category_id)
-        user.category_2 = category
-        user.user_state = "add_course"
-        user.save()
-        category.save()
-        if current_language == 'UZ':
-            bot.edit_message_text("qaysi kursda o'qishni hohlaysiz", chat_id, call.message.message_id,
-                                  reply_markup=course_keyboard_uz(category_id))
-        elif current_language == 'RU':
-            bot.edit_message_text("какой курс вы хотите изучать", chat_id, call.message.message_id,
-                                  reply_markup=course_keyboard_ru(category_id))
+        interest_id = user.interest_2
+        if call.data == "back_to_regions":
+            user.user_state = "add_education"
+            if current_language == 'UZ':
+                bot.edit_message_text("Qayerda o'qishni hohlaysiz", chat_id, call.message.message_id,
+                                    reply_markup=education_keyboard(interest_id))
+            elif current_language == 'RU':
+                bot.edit_message_text("Где вы хотите учиться?", chat_id, call.message.message_id,
+                                    reply_markup=education_keyboard(interest_id))
+        else:
+            category = Category.objects.get(pk=category_id)
+            user.category_2 = category
+            user.user_state = "add_course"
+            user.save()
+            category.save()
+            if current_language == 'UZ':
+                bot.edit_message_text("qaysi kursda o'qishni hohlaysiz", chat_id, call.message.message_id,
+                                    reply_markup=course_keyboard_uz(category_id))
+            elif current_language == 'RU':
+                bot.edit_message_text("какой курс вы хотите изучать", chat_id, call.message.message_id,
+                                    reply_markup=course_keyboard_ru(category_id))
 
 
 
     elif current_state == "add_course":
         user = BotUser.objects.get(chat_id=chat_id)
         course_id = call.data.split('_')[1]
-        course = Course.objects.get(pk=course_id)
-        user.course_2 = course
-        user.user_state = "wait_change_2"
-        user.save()
-        course.save()
-        if current_language == 'UZ':
-            bot.edit_message_text("Yana biror sohaga qiziqishingiz mavjudmi?", chat_id, call.message.message_id,
-                                  reply_markup=confirm_uz())
-        elif current_language == "RU":
-            bot.edit_message_text("Вас интересует другая сфера?", chat_id, call.message.message_id,
-                                  reply_markup=confirm_ru())
+        interest_id = user.interest_2
+        if call.data == "back_to_regions":
+            user.user_state = "add_category"
+            if current_language == 'UZ':
+                bot.edit_message_text("Qayerda o'qishni hohlaysiz", chat_id, call.message.message_id,
+                                    reply_markup=category_keyboard_uz(interest_id))
+            elif current_language == 'RU':
+                bot.edit_message_text("Где вы хотите учиться?", chat_id, call.message.message_id,
+                                    reply_markup=category_keyboard_ru(interest_id))
+        else:
+            course = Course.objects.get(pk=course_id)
+            user.course_2 = course
+            user.user_state = "wait_change_2"
+            user.save()
+            course.save()
+            if current_language == 'UZ':
+                bot.edit_message_text(f"Siz {course} ni tanladingiz, yana biror sohaga qiziqishingiz mavjudmi?", chat_id, call.message.message_id,
+                                    reply_markup=confirm_uz())
+            elif current_language == "RU":
+                bot.edit_message_text(f"Вы вибрали {course}, вас интересует другая сфера?", chat_id, call.message.message_id,
+                                    reply_markup=confirm_ru())
 
     elif current_state == "wait_change_2":
         user = BotUser.objects.get(chat_id=chat_id)
@@ -402,54 +502,85 @@ def lang(call):
     elif current_state == "add_education_2":
         user = BotUser.objects.get(chat_id=chat_id)
         education_id = call.data.split('_')[1]
-        education = Education.objects.get(pk=education_id)
-        user.education_3 = education
-        user.user_state = "add_category_2"
-        user.save()
-        education.save()
-        if current_language == 'UZ':
-            bot.edit_message_text("Qaysi yo'nalishda o'qishni hohlaysiz", chat_id, call.message.message_id,
-                                  reply_markup=category_keyboard_uz(education_id))
-        elif current_language == 'RU':
-            bot.edit_message_text("В каком направлении вы хотите учиться", chat_id, call.message.message_id,
-                                  reply_markup=category_keyboard_ru(education_id))
+        if call.data == "back_to_regions":
+            user.user_state = "add_interest_2"
+            if current_language == "UZ":
+                bot.edit_message_text("Qaysi soha sizni ko'proq qiziqtiradi? Bir yoki bir nechta variantni tanlang: ",chat_id, call.message.message_id,
+                             reply_markup=interest_keyboard_uz())
+            elif current_language == "RU":
+                bot.edit_message_text("Какая сфера вас интересует больше всего? Выберите один или несколько вариантов:",chat_id, call.message.message_id,
+                             reply_markup=interest_keyboard_ru())
+        else:
+            education = Education.objects.get(pk=education_id)
+            user.education_3 = education
+            interest_id = user.interest_3
+            user.user_state = "add_category_2"
+            user.save()
+            education.save()
+            if current_language == 'UZ':
+                bot.edit_message_text("Qaysi yo'nalishda o'qishni hohlaysiz", chat_id, call.message.message_id,
+                                    reply_markup=category_keyboard_uz(interest_id))
+            elif current_language == 'RU':
+                bot.edit_message_text("В каком направлении вы хотите учиться", chat_id, call.message.message_id,
+                                    reply_markup=category_keyboard_ru(interest_id))
 
     elif current_state == "add_category_2":
         user = BotUser.objects.get(chat_id=chat_id)
         category_id = call.data.split('_')[1]
-        category = Category.objects.get(pk=category_id)
-        user.category_3 = category
-        user.user_state = "add_course_2"
-        user.save()
-        category.save()
-        if current_language == 'UZ':
-            bot.edit_message_text("qaysi kursda o'qishni hohlaysiz", chat_id, call.message.message_id,
-                                  reply_markup=course_keyboard_uz(category_id))
-        elif current_language == 'RU':
-            bot.edit_message_text("какой курс вы хотите изучать", chat_id, call.message.message_id,
-                                  reply_markup=course_keyboard_ru(category_id))
+        interest_id = user.interest_3
+        if call.data == "back_to_regions":
+            user.user_state = "add_education_2"
+            if current_language == 'UZ':
+                bot.edit_message_text("Qayerda o'qishni hohlaysiz", chat_id, call.message.message_id,
+                                    reply_markup=education_keyboard(interest_id))
+            elif current_language == 'RU':
+                bot.edit_message_text("Где вы хотите учиться?", chat_id, call.message.message_id,
+                                    reply_markup=education_keyboard(interest_id))
+        else:
+            category = Category.objects.get(pk=category_id)
+            user.category_3 = category
+            user.user_state = "add_course_2"
+            user.save()
+            category.save()
+            if current_language == 'UZ':
+                bot.edit_message_text("qaysi kursda o'qishni hohlaysiz", chat_id, call.message.message_id,
+                                    reply_markup=course_keyboard_uz(category_id))
+            elif current_language == 'RU':
+                bot.edit_message_text("какой курс вы хотите изучать", chat_id, call.message.message_id,
+                                    reply_markup=course_keyboard_ru(category_id))
 
 
 
     elif current_state == "add_course_2":
         user = BotUser.objects.get(chat_id=chat_id)
         course_id = call.data.split('_')[1]
-        course = Course.objects.get(pk=course_id)
-        user.course_3 = course
-        user.user_state = "wait_problems"
-        user.save()
-        course.save()
-        if current_language == 'UZ':
-            bot.edit_message_text("sizda ushbu kurda o'qish uchun qanday muamolar mavjud?", chat_id,
-                                  call.message.message_id, reply_markup=problem_keyboard_uz())
-        elif current_language == "RU":
-            bot.edit_message_text("Какие проблемы вам предстоит изучить на этом курсе?", chat_id,
-                                  call.message.message_id, reply_markup=problem_keyboard_uz())
+        interest_id = user.interest_3
+        if call.data == "back_to_regions":
+            user.user_state = "add_category_2"
+            if current_language == 'UZ':
+                bot.edit_message_text("Qayerda o'qishni hohlaysiz", chat_id, call.message.message_id,
+                                    reply_markup=category_keyboard_uz(interest_id))
+            elif current_language == 'RU':
+                bot.edit_message_text("Где вы хотите учиться?", chat_id, call.message.message_id,
+                                    reply_markup=category_keyboard_ru(interest_id))
+        else:
+            course = Course.objects.get(pk=course_id)
+            user.course_3 = course
+            user.user_state = "wait_problems"
+            user.save()
+            course.save()
+            if current_language == 'UZ':
+                bot.edit_message_text("sizda ushbu kurda o'qish uchun qanday muamolar mavjud?", chat_id,
+                                    call.message.message_id, reply_markup=problem_keyboard_uz())
+            elif current_language == "RU":
+                bot.edit_message_text("Какие проблемы вам предстоит изучить на этом курсе?", chat_id,
+                                    call.message.message_id, reply_markup=problem_keyboard_uz())
 
     elif current_state == "wait_problems":
         user = BotUser.objects.get(chat_id=chat_id)
         problem_id = call.data.split('_')[1]
         user.user_state = "add_problem"
+        problems = Problem.objects.get(pk=problem_id)
         user.save()
         if current_language == 'UZ':
             bot.edit_message_text("sizda ushbu kurda o'qish uchun qanday muamolar mavjud?", chat_id,
@@ -460,19 +591,28 @@ def lang(call):
 
     elif current_state == "add_problem":
         user = BotUser.objects.get(chat_id=chat_id)
-        child_id = call.data.split('_')[2]
-        problem = Problem.objects.get(pk=child_id)
-        user.problem = problem
-        user.user_state = "wait_security"
-        user.save()
-        problem.save()
-        if current_language == 'UZ':
-            bot.edit_message_text(f"Siz {problem} ni tanladingiz o'zgartirishni hohlaysizmi?", chat_id,
-                                  call.message.message_id, reply_markup=confirm_uz())
+        if call.data == "back_to_regions":
+            user.user_state = "wait_problems"
+            if current_language == 'UZ':
+                bot.edit_message_text("sizda ushbu kurda o'qish uchun qanday muamolar mavjud?", chat_id,
+                                    call.message.message_id, reply_markup=problem_keyboard_uz())
+            elif current_language == 'RU':
+                bot.edit_message_text("Какие проблемы вам предстоит изучить на этом курсе?", chat_id,
+                                    call.message.message_id, reply_markup=problem_keyboard_ru())
+        else:
+            child_id = call.data.split('_')[1]
+            problem = Problem.objects.get(pk=child_id)
+            user.problem = problem
+            user.user_state = "wait_security"
+            user.save()
+            problem.save()
+            if current_language == 'UZ':
+                bot.edit_message_text(f"Siz {problem} ni tanladingiz o'zgartirishni hohlaysizmi?", chat_id,
+                                    call.message.message_id, reply_markup=confirm_uz())
 
-        elif current_language == "RU":
-            bot.edit_message_text(f"Вы выбрали {problem}. Хотите изменить?", chat_id,
-                                  call.message.message_id, reply_markup=confirm_ru())
+            elif current_language == "RU":
+                bot.edit_message_text(f"Вы выбрали {problem}. Хотите изменить?", chat_id,
+                                    call.message.message_id, reply_markup=confirm_ru())
 
     elif current_state == "wait_security":
         user = BotUser.objects.get(chat_id=chat_id)
@@ -626,21 +766,14 @@ def messages(message):
     elif current_state == "wait_adress":
         user = BotUser.objects.get(chat_id=chat_id)
         user.adress = message.text
-        region = user.region
-        district = user.district
-        quarter = user.quarter
-        user.user_state = "show_info"
+        user.user_state = "wait_interest"
         user.save()
-        bot.edit_message_text(f"Siz {region, district, quarter, message.text} ni kiritdingiz ma'lumotlarni o'zgartirishni hohlaysizmi?",chat_id=message.chat.id, reply_markup=confirm_uz())
-
-        # user.user_state = "wait_interest"
-        # user.save()
-        # if current_language == "UZ":
-        #     bot.send_message(chat_id, "Qaysi soha sizni ko'proq qiziqtiradi? Bir yoki bir nechta variantni tanlang: ",
-        #                      reply_markup=interest_keyboard_uz())
-        # elif current_language == "RU":
-        #     bot.send_message(chat_id, "Какая сфера вас интересует больше всего? Выберите один или несколько вариантов:",
-        #                      reply_markup=interest_keyboard_ru())
+        if current_language == "UZ":
+            bot.send_message(chat_id, "Qaysi soha sizni ko'proq qiziqtiradi? Bir yoki bir nechta variantni tanlang: ",
+                             reply_markup=interest_keyboard_uz())
+        elif current_language == "RU":
+            bot.send_message(chat_id, "Какая сфера вас интересует больше всего? Выберите один или несколько вариантов:",
+                             reply_markup=interest_keyboard_ru())
 
 
 bot.polling(none_stop=True)

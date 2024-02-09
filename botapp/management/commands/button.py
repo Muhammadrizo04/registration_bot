@@ -122,24 +122,30 @@ def education_keyboard(interest_id):
     for education in educations:
         button = types.InlineKeyboardButton(education.name_uz, callback_data=f"education_{education.id}")
         keyboard.add(button)
+    back_button = types.InlineKeyboardButton('⬅️ Orqaga', callback_data='back_to_regions')
+    keyboard.add(back_button) 
     return keyboard
 
 
-def category_keyboard_uz(education_id):
+def category_keyboard_uz(interest_id):
     keyboard = types.InlineKeyboardMarkup()
-    categorys = Category.objects.filter(education_id=education_id).order_by('name_uz')
+    categorys = Category.objects.filter(interest_id=interest_id).order_by('name_uz')
     for category in categorys:
         button = types.InlineKeyboardButton(category.name_uz, callback_data=f"category_{category.id}")
         keyboard.add(button)
+    back_button = types.InlineKeyboardButton('⬅️ Orqaga', callback_data='back_to_regions')
+    keyboard.add(back_button) 
     return keyboard
 
 
-def category_keyboard_ru(education_id):
+def category_keyboard_ru(interest_id):
     keyboard = types.InlineKeyboardMarkup()
-    categorys = Category.objects.filter(education_id=education_id).order_by('name_ru')
+    categorys = Category.objects.filter(interest_id=interest_id).order_by('name_ru')
     for category in categorys:
         button = types.InlineKeyboardButton(category.name_ru, callback_data=f"category_{category.id}")
         keyboard.add(button)
+    back_button = types.InlineKeyboardButton('⬅️ Назад', callback_data='back_to_regions')
+    keyboard.add(back_button) 
     return keyboard
 
 
@@ -149,6 +155,8 @@ def course_keyboard_uz(category_id):
     for course in courses:
         button = types.InlineKeyboardButton(course.name_uz, callback_data=f"course_{course.id}")
         keyboard.add(button)
+    back_button = types.InlineKeyboardButton('⬅️ Orqaga', callback_data='back_to_regions')
+    keyboard.add(back_button) 
     return keyboard
 
 
@@ -158,6 +166,8 @@ def course_keyboard_ru(category_id):
     for course in courses:
         button = types.InlineKeyboardButton(course.name_ru, callback_data=f"course_{course.id}")
         keyboard.add(button)
+    back_button = types.InlineKeyboardButton('⬅️ Назад', callback_data='back_to_regions')
+    keyboard.add(back_button) 
     return keyboard
 
 
@@ -185,14 +195,18 @@ def problem_child_uz(problem_id):
     keyboard = types.InlineKeyboardMarkup()
     problems = Problem.objects.filter(parent__id=problem_id).order_by('name_uz')
     for problem in problems:
-        button = types.InlineKeyboardButton(problem.name_uz, callback_data=f"problem_child_{problem.id}")
+        button = types.InlineKeyboardButton(problem.name_uz, callback_data=f"child_{problem.id}")
         keyboard.add(button)
+    back_button = types.InlineKeyboardButton('⬅️ Orqaga', callback_data='back_to_regions')
+    keyboard.add(back_button) 
     return keyboard
 
 def problem_child_ru(problem_id):
     keyboard = types.InlineKeyboardMarkup()
     problems = Problem.objects.filter(parent__id=problem_id).order_by('name_uz')
     for problem in problems:
-        button = types.InlineKeyboardButton(problem.name_ru, callback_data=f"problem_child_{problem.id}")
+        button = types.InlineKeyboardButton(problem.name_ru, callback_data=f"child_{problem.id}")
         keyboard.add(button)
+    back_button = types.InlineKeyboardButton('⬅️ Назад', callback_data='back_to_regions')
+    keyboard.add(back_button) 
     return keyboard

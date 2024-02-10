@@ -44,10 +44,10 @@ def quarter_buttons_uz(page_number, total_pages, names_queryset):
 
 def quarter_buttons_ru(page_number, total_pages, names_queryset):
     keyboard = types.InlineKeyboardMarkup(row_width=2)  # Set row width to 2 for quarters
-    names_and_ids = [(quarter.name_ru, quarter.id) for quarter in
+    names_and_ids = [(quarter.name_uz, quarter.id) for quarter in
                      names_queryset[(page_number - 1) * names_per_page:page_number * names_per_page]]
-    for index, (name_ru, quarter_id) in enumerate(names_and_ids):
-        button_text = str(name_ru)  # Convert to string to be safe
+    for index, (name_uz, quarter_id) in enumerate(names_and_ids):
+        button_text = str(name_uz)  # Convert to string to be safe
         button = types.InlineKeyboardButton(button_text, callback_data=f"quarter_id_{quarter_id}")
         if index % 2 == 0:
             row = [button]
@@ -133,7 +133,6 @@ def lang(call):
 
     elif current_state == "wait_district":
         user = BotUser.objects.get(chat_id=chat_id)
-        district_id = call.data.split('_')[1]
         if call.data == "back_to_regions":
             user = BotUser.objects.get(chat_id=chat_id)
             user.user_state = "wait_region"
@@ -145,6 +144,7 @@ def lang(call):
                 bot.edit_message_text("Выберите область", chat_id, call.message.message_id,
                                       reply_markup=region_keyboard_uz())
         else:
+            district_id = call.data.split('_')[1]
             district = District.objects.get(pk=district_id)
             user.district = district
             user.selected_district_id = district_id
@@ -270,7 +270,6 @@ def lang(call):
 
     elif current_state == "wait_education":
         user = BotUser.objects.get(chat_id=chat_id)
-        education_id = call.data.split('_')[1]
         if call.data == "back_to_regions":
             user.user_state = "wait_interest"
             if current_language == "UZ":
@@ -280,6 +279,7 @@ def lang(call):
                 bot.edit_message_text("Какая сфера вас интересует больше всего? Выберите один или несколько вариантов:",chat_id, call.message.message_id,
                              reply_markup=interest_keyboard_ru())
         else:
+            education_id = call.data.split('_')[1]
             education = Education.objects.get(pk=education_id)
             user.education = education
             interest_id = user.interest
@@ -296,7 +296,6 @@ def lang(call):
 
     elif current_state == "wait_category":
         user = BotUser.objects.get(chat_id=chat_id)
-        category_id = call.data.split('_')[1]
         interest_id = user.interest
         if call.data == "back_to_regions":
             user.user_state = "wait_education"
@@ -307,6 +306,7 @@ def lang(call):
                 bot.edit_message_text("Где вы хотите учиться?", chat_id, call.message.message_id,
                                     reply_markup=education_keyboard(interest_id))
         else:
+            category_id = call.data.split('_')[1]
             category = Category.objects.get(pk=category_id)
             user.category = category
             user.user_state = "wait_course"
@@ -323,7 +323,6 @@ def lang(call):
 
     elif current_state == "wait_course":
         user = BotUser.objects.get(chat_id=chat_id)
-        course_id = call.data.split('_')[1]
         interest_id = user.interest
         if call.data == "back_to_regions":
             user.user_state = "wait_category"
@@ -334,6 +333,7 @@ def lang(call):
                 bot.edit_message_text("Где вы хотите учиться?", chat_id, call.message.message_id,
                                     reply_markup=category_keyboard_ru(interest_id))
         else:
+            course_id = call.data.split('_')[1]
             course = Course.objects.get(pk=course_id)
             user.course = course
             user.user_state = "wait_change"
@@ -386,7 +386,6 @@ def lang(call):
 
     elif current_state == "add_education":
         user = BotUser.objects.get(chat_id=chat_id)
-        education_id = call.data.split('_')[1]
         if call.data == "back_to_regions":
             user.user_state = "add_interest"
             if current_language == "UZ":
@@ -396,6 +395,7 @@ def lang(call):
                 bot.edit_message_text("Какая сфера вас интересует больше всего? Выберите один или несколько вариантов:",chat_id, call.message.message_id,
                              reply_markup=interest_keyboard_ru())
         else:
+            education_id = call.data.split('_')[1]
             education = Education.objects.get(pk=education_id)
             user.education_2 = education
             interest_id = user.interest_2
@@ -411,7 +411,6 @@ def lang(call):
 
     elif current_state == "add_category":
         user = BotUser.objects.get(chat_id=chat_id)
-        category_id = call.data.split('_')[1]
         interest_id = user.interest_2
         if call.data == "back_to_regions":
             user.user_state = "add_education"
@@ -422,6 +421,7 @@ def lang(call):
                 bot.edit_message_text("Где вы хотите учиться?", chat_id, call.message.message_id,
                                     reply_markup=education_keyboard(interest_id))
         else:
+            category_id = call.data.split('_')[1]
             category = Category.objects.get(pk=category_id)
             user.category_2 = category
             user.user_state = "add_course"
@@ -438,7 +438,6 @@ def lang(call):
 
     elif current_state == "add_course":
         user = BotUser.objects.get(chat_id=chat_id)
-        course_id = call.data.split('_')[1]
         interest_id = user.interest_2
         if call.data == "back_to_regions":
             user.user_state = "add_category"
@@ -449,6 +448,7 @@ def lang(call):
                 bot.edit_message_text("Где вы хотите учиться?", chat_id, call.message.message_id,
                                     reply_markup=category_keyboard_ru(interest_id))
         else:
+            course_id = call.data.split('_')[1]
             course = Course.objects.get(pk=course_id)
             user.course_2 = course
             user.user_state = "wait_change_2"
@@ -501,7 +501,6 @@ def lang(call):
 
     elif current_state == "add_education_2":
         user = BotUser.objects.get(chat_id=chat_id)
-        education_id = call.data.split('_')[1]
         if call.data == "back_to_regions":
             user.user_state = "add_interest_2"
             if current_language == "UZ":
@@ -511,6 +510,7 @@ def lang(call):
                 bot.edit_message_text("Какая сфера вас интересует больше всего? Выберите один или несколько вариантов:",chat_id, call.message.message_id,
                              reply_markup=interest_keyboard_ru())
         else:
+            education_id = call.data.split('_')[1]
             education = Education.objects.get(pk=education_id)
             user.education_3 = education
             interest_id = user.interest_3
@@ -526,7 +526,6 @@ def lang(call):
 
     elif current_state == "add_category_2":
         user = BotUser.objects.get(chat_id=chat_id)
-        category_id = call.data.split('_')[1]
         interest_id = user.interest_3
         if call.data == "back_to_regions":
             user.user_state = "add_education_2"
@@ -537,6 +536,7 @@ def lang(call):
                 bot.edit_message_text("Где вы хотите учиться?", chat_id, call.message.message_id,
                                     reply_markup=education_keyboard(interest_id))
         else:
+            category_id = call.data.split('_')[1]
             category = Category.objects.get(pk=category_id)
             user.category_3 = category
             user.user_state = "add_course_2"
@@ -553,7 +553,6 @@ def lang(call):
 
     elif current_state == "add_course_2":
         user = BotUser.objects.get(chat_id=chat_id)
-        course_id = call.data.split('_')[1]
         interest_id = user.interest_3
         if call.data == "back_to_regions":
             user.user_state = "add_category_2"
@@ -564,6 +563,7 @@ def lang(call):
                 bot.edit_message_text("Где вы хотите учиться?", chat_id, call.message.message_id,
                                     reply_markup=category_keyboard_ru(interest_id))
         else:
+            course_id = call.data.split('_')[1]
             course = Course.objects.get(pk=course_id)
             user.course_3 = course
             user.user_state = "wait_problems"

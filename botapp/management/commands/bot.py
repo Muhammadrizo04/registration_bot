@@ -6,7 +6,7 @@ from common.models import Region, District, Quarter
 from django.conf import settings
 import os
 
-TOKEN = '6584674642:AAG_7MIMMrBiuD_smtd3aJMsofEoCMEXRVk'
+TOKEN = 'YOU_BOT_API'
 bot = telebot.TeleBot(TOKEN)
 
 names_per_page = 10
